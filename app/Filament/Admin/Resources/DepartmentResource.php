@@ -12,7 +12,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Checkbox;
-use Filament\Resources\RelationManagers;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Str;
 use App\Filament\Admin\Resources\DepartmentResource\RelationManagers\CategoriesRelationManager;
