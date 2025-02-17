@@ -39,10 +39,21 @@ class CategoriesRelationManager extends RelationManager
                     })
                     ->label('Parent Category')
                     ->preload()
-                    ->searchable(),
+                    ->searchable()
+                    ->nullable(),
 
-                Checkbox::make('active'),
+                Checkbox::make('active')
+                    ->default(true),
+
+                Forms\Components\Hidden::make('department_id')
+                    ->default(fn () => $department->id),
             ]);
+    }
+
+    public function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['department_id'] = $this->getOwnerRecord()->id;
+        return $data;
     }
 
     public function table(Table $table): Table
