@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Enums\RolesEnum;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -12,13 +13,12 @@ use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use App\Enums\RolesEnum;
-use Illuminate\Database\Eloquent\Model;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -27,6 +27,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
+            ->sidebarWidth('14rem')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -56,13 +57,12 @@ class AdminPanelProvider extends PanelProvider
                     RolesEnum::Admin->value,
                     RolesEnum::Vendor->value,
                 ),
-            ])
-            // ->authMiddleware([
-            //     Authenticate::class,
-            // ])
-        ;
+            ]);
+        // ->authMiddleware([
+        //     Authenticate::class,
+        // ])
     }
-    
+
     public function boot()
     {
         Model::unguard();

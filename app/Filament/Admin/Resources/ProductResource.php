@@ -2,7 +2,7 @@
 
 namespace App\Filament\Admin\Resources;
 
-use App\Enums\Enums\ProductStatusEnum;
+use App\Enums\ProductStatusEnum;
 use App\Enums\RolesEnum;
 use App\Filament\Admin\Resources\ProductResource\Pages;
 use App\Models\Product;
@@ -30,6 +30,11 @@ class ProductResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-s-queue-list';
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->forVendor();
+    }
 
     public static function form(Form $form): Form
     {
@@ -165,6 +170,8 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
             'image' => Pages\ProductImages::route('/{record}/images'),
+            'variation_types' => Pages\ProductVariationTypes::route('/{record}/variation-types'),
+            'variations' => Pages\ProductVariations::route('/{record}/variations'),
         ];
     }
 
@@ -173,6 +180,8 @@ class ProductResource extends Resource
         return $page->generateNavigationItems([
             Pages\EditProduct::class,
             Pages\ProductImages::class,
+            Pages\ProductVariationTypes::class,
+            Pages\ProductVariations::class,
         ]);
     }
 

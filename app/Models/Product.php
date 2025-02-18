@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\ProductStatusEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -15,13 +18,33 @@ class Product extends Model implements HasMedia
     public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
-            ->width(100);
+            ->width(100)
+            ->height(100)
+            ->sharpen(10)
+            ->nonQueued();
 
         $this->addMediaConversion('small')
-            ->width(480);
+            ->width(480)
+            ->height(480)
+            ->sharpen(10)
+            ->nonQueued();
 
         $this->addMediaConversion('large')
-            ->width(1200);
+            ->width(1200)
+            ->height(1200)
+            ->sharpen(10)
+            ->nonQueued();
+    }
+
+    public function scopeForVendor(Builder $query): Builder
+    {
+        return $query->where('created_by', auth()->user()->id);
+    }
+
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('status', ProductStatusEnum::Published);
     }
 
     public function department(): BelongsTo
@@ -33,5 +56,15 @@ class Product extends Model implements HasMedia
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function variationTypes(): HasMany
+    {
+        return $this->hasMany(VariationType::class);
+    }
+
+    public function variations(): HasMany
+    {
+        return $this->hasMany(ProductVariation::class, 'product_id');
     }
 }
