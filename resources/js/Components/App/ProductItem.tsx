@@ -1,9 +1,27 @@
 import { Product } from "@/types";
-import { Link } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import React from "react";
 import CurrencyFormatter from "../Core/CurrencyFormatter";
 
 function ProductItem({ product }: { product: Product }) {
+  const form = useForm<{
+    option_ids: Record<string, number>;
+    quantity: number;
+  }>({
+    option_ids: {},
+    quantity: 1,
+  });
+
+  const addToCart = () => {
+    form.post(route("cart.store", product.id), {
+      preserveScroll: true,
+      preserveState: true,
+      onError: (err) => {
+        console.log(err);
+      },
+    });
+  };
+
   return (
     <div className="shadow-xl card bg-base-100">
       <Link href={route("product.show", product.slug)}>
@@ -28,7 +46,9 @@ function ProductItem({ product }: { product: Product }) {
           </Link>
         </p>
         <div className="items-center justify-between mt-3 card-actions">
-          <button className="btn btn-primary">Add to Cart</button>
+          <button onClick={addToCart} className="btn btn-primary">
+            Add to Cart
+          </button>
           <span className="text-2xl">
             <CurrencyFormatter amount={product.price} />
           </span>

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Support\Facades\Auth;
+
 
 class Product extends Model implements HasMedia
 {
@@ -38,13 +40,18 @@ class Product extends Model implements HasMedia
 
     public function scopeForVendor(Builder $query): Builder
     {
-        return $query->where('created_by', auth()->user()->id);
+        return $query->where('created_by', Auth::user()->id);
     }
 
 
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', ProductStatusEnum::Published);
+    }
+
+    public function scopeForWebsite(Builder $query): Builder
+    {
+        return $query->published();
     }
 
     public function user(): BelongsTo
@@ -56,7 +63,6 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(Department::class);
     }
-
 
     public function category(): BelongsTo
     {
@@ -71,5 +77,24 @@ class Product extends Model implements HasMedia
     public function variations(): HasMany
     {
         return $this->hasMany(ProductVariation::class, 'product_id');
+    }
+
+
+    public function getPriceForOptions($optionIds = [])
+    {
+        $optionIds = array_values($optionIds);
+        sort($optionIds);
+
+        foreach ($this->variations as $variation) {
+            $temp = $variation->variation_type_option_ids;
+            sort($temp);
+            if ($optionIds == $temp) {
+                return $variation->price !== null
+                    ? $variation->price
+                    : $this->price;
+            }
+        }
+
+        return $this->price;
     }
 }

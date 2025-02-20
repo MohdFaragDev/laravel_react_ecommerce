@@ -7,6 +7,8 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Enums\RolesEnum;
+use App\Enums\VendorStatusEnum;
+use App\Models\Vendor;
 
 class UserSeeder extends Seeder
 {
@@ -15,10 +17,18 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'User',
             'email' => 'user@example.com',
-        ])->assignRole(RolesEnum::User->value);
+        ]);
+
+        $user->assignRole(RolesEnum::User->value);
+        Vendor::factory()->create([
+            'user_id' => $user->id,
+            'status' => VendorStatusEnum::Approved,
+            'store_name' => 'Vendor Store',
+            'store_address' => fake()->address(),
+        ]);
 
         User::factory()->create([
             'name' => 'Admin',

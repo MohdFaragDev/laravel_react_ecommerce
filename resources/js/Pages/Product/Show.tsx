@@ -78,7 +78,7 @@ function Show({
 
   const chooseOption = (
     typeId: number,
-    option: VariationTypeOption, // Todo: edit
+    option: VariationTypeOption,
     updateRouter: boolean = true
   ) => {
     setSelectedOptions((prevSelectedOptions) => {
@@ -174,7 +174,7 @@ function Show({
           className="w-full select select-bordered"
         >
           {Array.from({
-            length: Math.min(10, computedProduct.quantity),
+            length: Math.min(10, computedProduct.quantity ?? Math.min()),
           }).map((el, i) => (
             <option value={i + 1} key={i + 1}>
               Quantity: {i + 1}
@@ -191,7 +191,7 @@ function Show({
   useEffect(() => {
     const idsMap = Object.fromEntries(
       Object.entries(selectedOptions).map(
-        ([typeId, option]: [string, VariationTypeOption]) => [typeId, option.id] // todo:
+        ([typeId, option]: [string, VariationTypeOption]) => [typeId, option.id]
       )
     );
     console.log(idsMap);
