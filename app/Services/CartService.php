@@ -24,14 +24,8 @@ class CartService
 
     public function addItemToCart(Product $product, int $quantity = 1, $optionIds = null)
     {
-        if ($optionIds === null) {
-            $optionIds = $product->variationTypes
-                ->mapWithKeys(
-                    fn(VariationType $variationType) => [
-                        $variationType->id => $variationType->options[0]?->id
-                    ]
-                )
-                ->toArray();
+        if (!$optionIds) {
+            $optionIds = $product->getFirstOptionsMap();
         }
 
         $price = $product->getPriceForOptions($optionIds);

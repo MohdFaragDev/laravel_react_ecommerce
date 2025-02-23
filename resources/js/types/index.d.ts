@@ -5,6 +5,14 @@ export interface User {
     name: string;
     email: string;
     email_verified_at?: string;
+    stripe_account_active: boolean;
+    vendor: {
+      status: string;
+      status_label: string;
+      store_name: string;
+      store_address: string;
+      cover_image: string;
+    }
 }
 
 export type Image = {
@@ -41,6 +49,7 @@ export type Product = {
   user: {
     id: number;
     name:string;
+    store_name: string;
   };
   department: {
     id: number;
@@ -83,6 +92,11 @@ export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
     csrf_token:string;
+    error: string;
+    success: {
+      message: string,
+      time: number;
+    },
     auth: {
         user: User;
     };
@@ -90,4 +104,10 @@ export type PageProps<
     totalQuantity: number;
     totalPrice: number;
     miniCartItems: CartItem[];
+};
+
+export type Vendor = {
+  id: number;
+  store_name: string;
+  store_address:string;
 };

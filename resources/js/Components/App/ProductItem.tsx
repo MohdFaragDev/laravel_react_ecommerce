@@ -1,6 +1,5 @@
 import { Product } from "@/types";
 import { Link, useForm } from "@inertiajs/react";
-import React from "react";
 import CurrencyFormatter from "../Core/CurrencyFormatter";
 
 function ProductItem({ product }: { product: Product }) {
@@ -37,8 +36,11 @@ function ProductItem({ product }: { product: Product }) {
         <h2 className="card-title">{product.title}</h2>
         <p>
           by{" "}
-          <Link href="/" className="hover:underline">
-            {product.user.name}
+          <Link
+            href={route("vendor.profile", product.user.store_name)}
+            className="hover:underline"
+          >
+            {product.user.store_name}
           </Link>
           &nbsp; in{" "}
           <Link href="/" className="hover:underline">

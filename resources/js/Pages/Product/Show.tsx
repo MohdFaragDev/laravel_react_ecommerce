@@ -3,7 +3,7 @@ import CurrencyFormatter from "@/Components/Core/CurrencyFormatter";
 import { arraysAreEqual } from "@/helpers";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Product, VariationTypeOption } from "@/types";
-import { Head, router, useForm, usePage } from "@inertiajs/react";
+import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
 import React, { useEffect, useMemo, useState } from "react";
 
 function Show({
@@ -201,7 +201,6 @@ function Show({
   return (
     <AuthenticatedLayout>
       <Head title={product.title} />
-
       <div className="container p-8 mx-auto">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="col-span-7">
@@ -209,7 +208,22 @@ function Show({
           </div>
 
           <div className="col-span-5">
-            <h1 className="mb-8 text-2xl">{product.title}</h1>
+            <h1 className="text-2xl">{product.title}</h1>
+
+            <p className="mb-8">
+              by{" "}
+              <Link
+                href={route("vendor.profile", product.user.store_name)}
+                className="hover:underline"
+              >
+                {product.user.store_name}
+              </Link>
+              &nbsp; in{" "}
+              <Link href="/" className="hover:underline">
+                {product.department.name}
+              </Link>
+            </p>
+
             <div>
               <div className="text-3xl font-semibold">
                 <CurrencyFormatter amount={computedProduct.price} />

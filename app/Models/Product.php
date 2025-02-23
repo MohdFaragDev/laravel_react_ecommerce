@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use App\Enums\ProductStatusEnum;
+use App\Enums\VendorStatusEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Support\Facades\Auth;
-
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
 class Product extends Model implements HasMedia
 {
@@ -46,13 +48,20 @@ class Product extends Model implements HasMedia
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', ProductStatusEnum::Published);
+        return $query->where('products.status', ProductStatusEnum::Published);
     }
 
     public function scopeForWebsite(Builder $query): Builder
     {
-        return $query->published();
+        return $query->published()->vendorApproved();
     }
+
+    public function scopeVendorApproved(Builder $query): Builder
+    {
+        return $query->join('vendors', 'vendors.user_id', '=', 'products.created_by')
+            ->where('vendors.status', VendorStatusEnum::Approved->value);
+    }
+
 
     public function user(): BelongsTo
     {
@@ -72,6 +81,18 @@ class Product extends Model implements HasMedia
     public function variationTypes(): HasMany
     {
         return $this->hasMany(VariationType::class);
+    }
+
+    public function options(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            VariationTypeOption::class,
+            VariationType::class,
+            'product_id',
+            'variation_type_id',
+            'id',
+            'id',
+        );
     }
 
     public function variations(): HasMany
@@ -96,5 +117,50 @@ class Product extends Model implements HasMedia
         }
 
         return $this->price;
+    }
+
+    public function getPriceForFirstOption(): float
+    {
+        $firstOptions = $this->getFirstOptionsMap();
+
+        if ($firstOptions) {
+            return $this->getPriceForOptions($firstOptions);
+        }
+
+        return $this->price;
+    }
+
+    public function getFirstImageUrl($collectionName = 'images', $conversion = 'small'): string
+    {
+        if ($this->options->count() > 0) {
+            foreach ($this->options as $option) {
+                $imageUrl = $option->getFirstMediaUrl($collectionName, $conversion);
+                if ($imageUrl) {
+                    return $imageUrl;
+                }
+            }
+        }
+
+        return $this->getFirstMediaUrl($collectionName, $conversion);
+    }
+
+    public function getImages(): MediaCollection
+    {
+        if ($this->options->count() > 0) {
+            foreach ($this->options as $option) {
+                $images = $option->getMedia('images');
+                if ($images) {
+                    return $images;
+                }
+            }
+        }
+        return $this->getMedia('images');
+    }
+
+    public function getFirstOptionsMap(): array
+    {
+        return $this->variationTypes
+            ->mapWithKeys(fn($type) => [$type->id => $type->options[0]?->id])
+            ->toArray();
     }
 }
