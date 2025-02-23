@@ -13,11 +13,18 @@ use Inertia\Inertia;
 
 class VendorController extends Controller
 {
-    public function profile(Vendor $vendor)
+    public function profile(Request $request, Vendor $vendor)
     {
+        $keyword = $request->query('keyword');
 
         $products = Product::query()
             ->forWebsite()
+            ->when($keyword, function ($query, $keyword) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('title', 'like', '%' . $keyword . '%')
+                        ->orWhere('description', 'like', '%' . $keyword . '%');
+                });
+            })
             ->where('created_by', $vendor->user_id)
             ->paginate();
 
@@ -25,7 +32,7 @@ class VendorController extends Controller
             'Vendor/Profile',
             [
                 'vendor' => $vendor,
-                'products' => ProductListResource::collection($products)
+                'products' => ProductListResource::collection($products),
             ]
         );
     }

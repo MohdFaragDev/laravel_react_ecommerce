@@ -20,6 +20,8 @@ class ProductResource extends JsonResource
             "title" => $this->title,
             "slug" => $this->slug,
             "description" => $this->description,
+            'meta_title' => $this->meta_title,
+            'meta_description' => $this->meta_description,
             "price" => $this->price,
             "quantity" => $this->qunatity,
             "images" => $this->getFirstMediaUrl('images'),
@@ -39,6 +41,7 @@ class ProductResource extends JsonResource
             'department' => [
                 'id' => $this->department->id,
                 'name' => $this->department->name,
+                "slug" => $this->department->slug,
             ],
             'variationTypes' => $this->variationTypes->map(function ($variationType) {
                 return [

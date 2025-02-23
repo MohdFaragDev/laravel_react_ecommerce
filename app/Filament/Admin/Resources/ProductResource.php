@@ -17,6 +17,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\RichEditor;
 use Illuminate\Support\Str;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Resources\Pages\Page;
@@ -110,6 +112,12 @@ class ProductResource extends Resource
                     ->default(ProductStatusEnum::Draft->value)
                     ->required(),
 
+                Section::make('SEO')
+                    ->collapsable()
+                    ->schema([
+                        TextInput::make('meta_title'),
+                        Textarea::make('meta_description')
+                    ]),
             ]);
     }
 
